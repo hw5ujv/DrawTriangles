@@ -1,0 +1,17 @@
+﻿<Window x:Class="DrawTriangles.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DrawTriangles"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Button Content="Click to load" Click="Button_Click" Width="100" Height="100" HorizontalAlignment="Right" VerticalAlignment="Top">
+            
+        </Button>
+        <Canvas x:Name="drawingCanvas" ClipToBounds="True" MouseLeftButtonDown="Image_PreviewMouseLeftButtonDown" MouseMove="Image_PreviewMouseMove" MouseUp="Image_PreviewMouseLeftButtonUp">
+            <Image x:Name="imagePicture" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Canvas>
+    </Grid>
+</Window>
