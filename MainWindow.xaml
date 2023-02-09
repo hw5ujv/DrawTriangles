@@ -11,7 +11,7 @@
             
         </Button>
         <Canvas x:Name="drawingCanvas" ClipToBounds="True" MouseLeftButtonDown="Image_PreviewMouseLeftButtonDown" MouseMove="Image_PreviewMouseMove" MouseUp="Image_PreviewMouseLeftButtonUp">
-            <Image x:Name="imagePicture" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Image x:Name="imagePicture" Width="600" Height="420" Stretch="Uniform"/>
         </Canvas>
     </Grid>
 </Window>

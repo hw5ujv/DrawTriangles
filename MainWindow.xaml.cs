@@ -25,6 +25,9 @@ namespace DrawTriangles
         private bool isMouseDown;
         private Point startPoint;
         private Rectangle rect;
+        Brush customColor;
+        Random r = new Random();
+        
         public MainWindow()
         {
             InitializeComponent();
@@ -37,17 +40,20 @@ namespace DrawTriangles
             openDialog.FilterIndex = 1;
             if(openDialog.ShowDialog() == true)
             {
+                drawingCanvas.Children.Clear();
                 imagePicture.Source = new BitmapImage(new Uri(openDialog.FileName));
-                
+                drawingCanvas.Children.Add(imagePicture);
             }
         }
 
         private void Image_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            startPoint = e.GetPosition(imagePicture);
+            startPoint = e.GetPosition(drawingCanvas);
+            customColor = new SolidColorBrush(Color.FromRgb((byte)r.Next(1, 255), (byte)r.Next(1, 255), (byte)r.Next(1, 255)));
             rect = new Rectangle
             {
                 Stroke = Brushes.Black,
+                Fill = customColor,
                 StrokeThickness = 2
             };
             Canvas.SetLeft(rect, startPoint.X);
@@ -60,7 +66,7 @@ namespace DrawTriangles
         {
             if (!isMouseDown) return;
 
-            var endPoint = e.GetPosition(imagePicture);
+            var endPoint = e.GetPosition(drawingCanvas);
             var width = Math.Abs(endPoint.X - startPoint.X);
             var height = Math.Abs(endPoint.Y - startPoint.Y);
 
