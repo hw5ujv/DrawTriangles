@@ -48,6 +48,8 @@ namespace DrawTriangles
                 drawingCanvas.Children.Clear();
                 imagePicture.Source = new BitmapImage(new Uri(openDialog.FileName));
                 drawingCanvas.Children.Add(imagePicture);
+                
+                
             }
         }
 
@@ -59,6 +61,7 @@ namespace DrawTriangles
             if (hitResult.VisualHit is Rectangle hitRect)
             {
                 selectedRectangle = hitRect;
+                AdornerLayer.GetAdornerLayer(MyGrid).Add(new ResizeAdorner(selectedRectangle));
                 isMouseDown = true;
             }
             else
@@ -74,6 +77,15 @@ namespace DrawTriangles
                 Canvas.SetTop(rect, startPoint.Y);
                 drawingCanvas.Children.Add(rect);
                 isMouseDown = true;
+
+                if(selectedRectangle != null)
+                {
+                    var adornerLayer = AdornerLayer.GetAdornerLayer(selectedRectangle);
+                    adornerLayer.Remove(adornerLayer.GetAdorners(selectedRectangle)[0]);
+                    selectedRectangle = null;
+                }
+
+
             }
             
         }
@@ -154,15 +166,13 @@ namespace DrawTriangles
         }
         
 
-
-
-
-
-
         private void Image_PreviewMouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             isMouseDown = false;
             selectedRectangle = null;
         }
     }
+
+
+
 }

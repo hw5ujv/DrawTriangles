@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:DrawTriangles"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
+    <Grid Name="MyGrid">
         <Button Content="Click to load" Click="Button_Click" Width="100" Height="100" HorizontalAlignment="Right" VerticalAlignment="Top" RenderTransformOrigin="0.493,0.542">
             
         </Button>
