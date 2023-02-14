@@ -1,16 +1,19 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Intrinsics.X86;
+using System.Security.Permissions;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -40,7 +43,7 @@ namespace DrawTriangles
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog openDialog = new OpenFileDialog();
+            Microsoft.Win32.OpenFileDialog openDialog = new Microsoft.Win32.OpenFileDialog();
             openDialog.Filter = "Image files|*.bmp;*.jpg;*.png";
             openDialog.FilterIndex = 1;
             if(openDialog.ShowDialog() == true)
@@ -53,6 +56,8 @@ namespace DrawTriangles
             }
         }
 
+
+
         private void Image_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             startPoint = e.GetPosition(drawingCanvas);
@@ -60,7 +65,13 @@ namespace DrawTriangles
             rect = null; // initialize rect with a default value of null
             if (hitResult.VisualHit is Rectangle hitRect)
             {
+                if(selectedRectangle != null)
+                {
+                    var adornerLayer = AdornerLayer.GetAdornerLayer(MyGrid);
+                    adornerLayer.Remove(adornerLayer.GetAdorners(selectedRectangle)[0]);
+                }
                 selectedRectangle = hitRect;
+                System.Diagnostics.Debug.WriteLine("selected rectangle" + hitResult.VisualHit);
                 AdornerLayer.GetAdornerLayer(MyGrid).Add(new ResizeAdorner(selectedRectangle));
                 isMouseDown = true;
             }
@@ -78,9 +89,10 @@ namespace DrawTriangles
                 drawingCanvas.Children.Add(rect);
                 isMouseDown = true;
 
+                
                 if(selectedRectangle != null)
                 {
-                    var adornerLayer = AdornerLayer.GetAdornerLayer(selectedRectangle);
+                    var adornerLayer = AdornerLayer.GetAdornerLayer(MyGrid);
                     adornerLayer.Remove(adornerLayer.GetAdorners(selectedRectangle)[0]);
                     selectedRectangle = null;
                 }
@@ -99,14 +111,6 @@ namespace DrawTriangles
             {
                 double left = endPoint.X - selectedRectangle.Width / 2;
                 double top = endPoint.Y - selectedRectangle.Height / 2;
-
-                //double left = Canvas.GetLeft(selectedRectangle);
-                //double top = Canvas.GetTop(selectedRectangle);
-                double width = selectedRectangle.Width;
-                double height = selectedRectangle.Height;
-                double mouseX = endPoint.X;
-                double mouseY = endPoint.Y;
-                double resizeThreshold = 5;
 
                 // Check if the rectangle is within the bounds of the image
                 if (left >= 0 && left + selectedRectangle.Width <= imagePicture.RenderSize.Width &&
@@ -144,7 +148,7 @@ namespace DrawTriangles
             //raise exception if there is no image load
             if (imagePicture.Source == null)
             {
-                MessageBox.Show("No image loaded. Please load an image before saving.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                System.Windows.MessageBox.Show("No image loaded. Please load an image before saving.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -154,7 +158,7 @@ namespace DrawTriangles
             PngBitmapEncoder encoder = new PngBitmapEncoder();
             encoder.Frames.Add(BitmapFrame.Create(renderTarget));
 
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog();
             saveFileDialog.Filter = "PNG image file|*.png";
             if (saveFileDialog.ShowDialog() == true)
             {
@@ -164,12 +168,36 @@ namespace DrawTriangles
                 }
             }
         }
-        
+
+        private void ChangeColorButton_Click(object sender, RoutedEventArgs e)
+        {
+            ColorDialog colorDialog = new ColorDialog();
+            if (colorDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                // Get the selected color
+                System.Drawing.Color selectedColor = colorDialog.Color;
+
+                // Update the color of the selected rectangle
+                if (selectedRectangle != null)
+                {
+                    SolidColorBrush brush = new SolidColorBrush(Color.FromArgb(selectedColor.A, selectedColor.R, selectedColor.G, selectedColor.B));
+                    selectedRectangle.Fill = brush;
+                    System.Diagnostics.Debug.WriteLine("Color changed successfully");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("No rectangle is selected");
+                }
+            }
+        }
+
+
+
 
         private void Image_PreviewMouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             isMouseDown = false;
-            selectedRectangle = null;
+            //selectedRectangle = null;
         }
     }
 
