@@ -39,6 +39,7 @@ namespace DrawTriangles
         public MainWindow()
         {
             InitializeComponent();
+            PreviewKeyDown += MainWindow_PreviewKeyDown;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -171,6 +172,11 @@ namespace DrawTriangles
 
         private void ChangeColorButton_Click(object sender, RoutedEventArgs e)
         {
+            if (selectedRectangle == null)
+            {
+                System.Windows.MessageBox.Show("No rectangle selected. Please click on a rectangle or create one.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
             ColorDialog colorDialog = new ColorDialog();
             if (colorDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
@@ -178,15 +184,23 @@ namespace DrawTriangles
                 System.Drawing.Color selectedColor = colorDialog.Color;
 
                 // Update the color of the selected rectangle
+                SolidColorBrush brush = new SolidColorBrush(Color.FromArgb(selectedColor.A, selectedColor.R, selectedColor.G, selectedColor.B));
+                selectedRectangle.Fill = brush;
+                System.Diagnostics.Debug.WriteLine("Color changed successfully");
+               
+            }
+        }
+
+        private void MainWindow_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.Back)
+            {
                 if (selectedRectangle != null)
                 {
-                    SolidColorBrush brush = new SolidColorBrush(Color.FromArgb(selectedColor.A, selectedColor.R, selectedColor.G, selectedColor.B));
-                    selectedRectangle.Fill = brush;
-                    System.Diagnostics.Debug.WriteLine("Color changed successfully");
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("No rectangle is selected");
+                    drawingCanvas.Children.Remove(selectedRectangle);
+                    var adornerLayer = AdornerLayer.GetAdornerLayer(MyGrid);
+                    adornerLayer.Remove(adornerLayer.GetAdorners(selectedRectangle)[0]);
+                    selectedRectangle = null;
                 }
             }
         }
