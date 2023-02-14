@@ -1,4 +1,4 @@
-# DrawTriangles
+# DrawRectangles
 The main feature of this software include: 
 1. load image from computer and set it as canvas
 2. create rectangle by clicking anywhere on the canvas, the size will depend on the moving of mouse
