@@ -44,12 +44,22 @@ namespace DrawTriangles
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            
             Microsoft.Win32.OpenFileDialog openDialog = new Microsoft.Win32.OpenFileDialog();
             openDialog.Filter = "Image files|*.bmp;*.jpg;*.png";
             openDialog.FilterIndex = 1;
             if(openDialog.ShowDialog() == true)
             {
+                if(selectedRectangle != null)
+                {
+                    selectedRectangle = null;
+                }
                 drawingCanvas.Children.Clear();
+                var adornerLayer = AdornerLayer.GetAdornerLayer(MyGrid);
+                if (adornerLayer != null && selectedRectangle != null)
+                {
+                    adornerLayer.Remove(adornerLayer.GetAdorners(selectedRectangle)[0]);
+                }
                 imagePicture.Source = new BitmapImage(new Uri(openDialog.FileName));
                 drawingCanvas.Children.Add(imagePicture);
                 
@@ -69,7 +79,11 @@ namespace DrawTriangles
                 if(selectedRectangle != null)
                 {
                     var adornerLayer = AdornerLayer.GetAdornerLayer(MyGrid);
-                    adornerLayer.Remove(adornerLayer.GetAdorners(selectedRectangle)[0]);
+                    if (adornerLayer != null)
+                    {
+                        adornerLayer.Remove(adornerLayer.GetAdorners(selectedRectangle)[0]);
+                    }
+                    
                 }
                 selectedRectangle = hitRect;
                 System.Diagnostics.Debug.WriteLine("selected rectangle" + hitResult.VisualHit);
@@ -94,7 +108,12 @@ namespace DrawTriangles
                 if(selectedRectangle != null)
                 {
                     var adornerLayer = AdornerLayer.GetAdornerLayer(MyGrid);
-                    adornerLayer.Remove(adornerLayer.GetAdorners(selectedRectangle)[0]);
+
+                    if (adornerLayer != null)
+                    {
+                        adornerLayer.Remove(adornerLayer.GetAdorners(selectedRectangle)[0]);
+                    }
+                    
                     selectedRectangle = null;
                 }
 
