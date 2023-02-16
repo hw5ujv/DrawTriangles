@@ -29,12 +29,12 @@ namespace DrawTriangles
     public partial class MainWindow : Window
     {
 
-        private bool isMouseDown;
-        private Point startPoint;
-        private Rectangle rect;
-        private Rectangle selectedRectangle;
+        private bool isMouseDown; //tracking if the mouse left button is down 
+        private Point startPoint; //tracking the strating point when drawing a rectanlge
+        private Rectangle rect; 
+        private Rectangle selectedRectangle; //the current rectangle that we pick
         Brush customColor;
-        Random r = new Random();
+        Random r = new Random(); //Random Utils
         
         public MainWindow()
         {
@@ -44,6 +44,7 @@ namespace DrawTriangles
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            //function for loading new image, a new dialog will be initiated.
             
             Microsoft.Win32.OpenFileDialog openDialog = new Microsoft.Win32.OpenFileDialog();
             openDialog.Filter = "Image files|*.bmp;*.jpg;*.png";
@@ -54,12 +55,16 @@ namespace DrawTriangles
                 {
                     selectedRectangle = null;
                 }
+                //when we load a new image, we want to clear the previous canvas
                 drawingCanvas.Children.Clear();
+
+                //if any of the rectanlge is selected in the previous canvas, we want to remove it
                 var adornerLayer = AdornerLayer.GetAdornerLayer(MyGrid);
                 if (adornerLayer != null && selectedRectangle != null)
                 {
                     adornerLayer.Remove(adornerLayer.GetAdorners(selectedRectangle)[0]);
                 }
+
                 imagePicture.Source = new BitmapImage(new Uri(openDialog.FileName));
                 drawingCanvas.Children.Add(imagePicture);
                 
@@ -74,10 +79,11 @@ namespace DrawTriangles
             startPoint = e.GetPosition(drawingCanvas);
             var hitResult = VisualTreeHelper.HitTest(drawingCanvas, startPoint);
             rect = null; // initialize rect with a default value of null
-            if (hitResult.VisualHit is Rectangle hitRect)
+            if (hitResult.VisualHit is Rectangle hitRect) // check if we are clicking on a rectangle
             {
                 if(selectedRectangle != null)
                 {
+                    //Remove the adorn layer for other rectangle if we currently selected other rectangles.
                     var adornerLayer = AdornerLayer.GetAdornerLayer(MyGrid);
                     if (adornerLayer != null)
                     {
@@ -85,6 +91,7 @@ namespace DrawTriangles
                     }
                     
                 }
+                //rendering the adorn layer for the clicked rectangle
                 selectedRectangle = hitRect;
                 System.Diagnostics.Debug.WriteLine("selected rectangle" + hitResult.VisualHit);
                 AdornerLayer.GetAdornerLayer(MyGrid).Add(new ResizeAdorner(selectedRectangle));
@@ -127,7 +134,7 @@ namespace DrawTriangles
             if (!isMouseDown) return;
 
             var endPoint = e.GetPosition(drawingCanvas);
-            if (selectedRectangle != null)
+            if (selectedRectangle != null) // If there is no rectangle selected, create rectangle
             {
                 double left = endPoint.X - selectedRectangle.Width / 2;
                 double top = endPoint.Y - selectedRectangle.Height / 2;
@@ -142,6 +149,7 @@ namespace DrawTriangles
             }
             else
             {
+                //drag and drop of the selected rectangle
                 var width = Math.Abs(endPoint.X - startPoint.X);
                 var height = Math.Abs(endPoint.Y - startPoint.Y);
 
@@ -191,6 +199,7 @@ namespace DrawTriangles
 
         private void ChangeColorButton_Click(object sender, RoutedEventArgs e)
         {
+            //handling the changing color dialog
             if (selectedRectangle == null)
             {
                 System.Windows.MessageBox.Show("No rectangle selected. Please click on a rectangle or create one.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -212,6 +221,7 @@ namespace DrawTriangles
 
         private void MainWindow_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
+            //For deleting the selected rectangle, use backspace key too delete.
             if (e.Key == Key.Back)
             {
                 if (selectedRectangle != null)
